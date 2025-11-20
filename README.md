@@ -40,7 +40,7 @@ Simplificação visual do fluxo do sistema (Clean Arquiteture / CQRS)
 # Endpoints da API
 
 A API, após executada, poderá ser visualizada acessando: 
-http://localhost:5157/swagger/index.html
+https://localhost:7000/swagger/index.html
 
 ## Products
 **Rota base:** /api/products

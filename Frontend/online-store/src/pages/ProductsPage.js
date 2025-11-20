@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { getProducts, deleteProduct, createProduct, updateProduct } from '../api/productAPI';
 import { Container, Table, Button, Modal, Form } from 'react-bootstrap';
 
@@ -11,7 +11,6 @@ export default function ProductsPage() {
   const [newProduct, setNewProduct] = useState({ name: '', price: '' });
   const [productToDelete, setProductToDelete] = useState(null);
 
-  // Carregar produtos
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -26,7 +25,39 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  // Adicionar novo produto
+  // Nome
+  const handleNameChange = useCallback((e) => {
+    const value = e.target.value;
+    if (productToEdit) {
+      setProductToEdit(prev => ({ ...prev, name: value }));
+    } else {
+      setNewProduct(prev => ({ ...prev, name: value }));
+    }
+  }, [productToEdit]);
+
+  // Preço
+  const handlePriceChange = useCallback((e) => {
+    const value = e.target.value;
+    if (productToEdit) {
+      setProductToEdit(prev => ({ ...prev, price: value }));
+    } else {
+      setNewProduct(prev => ({ ...prev, price: value }));
+    }
+  }, [productToEdit]);
+
+  // Editar produto
+  const handleEditClick = useCallback((product) => {
+    setProductToEdit(product);
+    setShowModal(true);
+  }, []);
+
+  // Excluir produto 
+  const handleDeleteClick = useCallback((product) => {
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  }, []);
+
+  // Adicionar produto
   const AddProduct = async () => {
     try {
       await createProduct(newProduct);
@@ -100,20 +131,14 @@ export default function ProductsPage() {
                   <td className="d-flex justify-content-between gap-2">
                     <Button
                       variant="warning"
-                      onClick={() => {
-                        setProductToEdit(product);
-                        setShowModal(true);
-                      }}
+                      onClick={() => handleEditClick(product)}
                       className='w-100'
                     >
                       Editar
-                    </Button>{' '}
+                    </Button>
                     <Button
                       variant="danger"
-                      onClick={() => {
-                        setProductToDelete(product);
-                        setShowDeleteModal(true);
-                      }}
+                      onClick={() => handleDeleteClick(product)}
                       className='w-100'
                     >
                       Excluir
@@ -124,7 +149,6 @@ export default function ProductsPage() {
             </tbody>
           </Table>
 
-          {/* Editar */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>{productToEdit ? 'Editar Produto' : 'Novo Produto'}</Modal.Title>
@@ -137,13 +161,7 @@ export default function ProductsPage() {
                     type="text"
                     placeholder="Nome do produto"
                     value={productToEdit ? productToEdit.name : newProduct.name}
-                    onChange={(e) => {
-                      if (productToEdit) {
-                        setProductToEdit({ ...productToEdit, name: e.target.value });
-                      } else {
-                        setNewProduct({ ...newProduct, name: e.target.value });
-                      }
-                    }}
+                    onChange={handleNameChange}
                   />
                 </Form.Group>
                 <Form.Group controlId="formProductPrice">
@@ -152,13 +170,7 @@ export default function ProductsPage() {
                     type="number"
                     placeholder="Preço do produto"
                     value={productToEdit ? productToEdit.price : newProduct.price}
-                    onChange={(e) => {
-                      if (productToEdit) {
-                        setProductToEdit({ ...productToEdit, price: e.target.value });
-                      } else {
-                        setNewProduct({ ...newProduct, price: e.target.value });
-                      }
-                    }}
+                    onChange={handlePriceChange}
                   />
                 </Form.Group>
               </Form>
@@ -176,7 +188,6 @@ export default function ProductsPage() {
             </Modal.Footer>
           </Modal>
 
-          {/* Excluir */}
           <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>Confirmar Exclusão</Modal.Title>

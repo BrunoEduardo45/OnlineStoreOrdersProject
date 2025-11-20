@@ -4,20 +4,20 @@ import { Container, Table, Button, Modal, Form, Badge, Row, Col, InputGroup } fr
 import { getProducts } from '../api/productAPI';
 
 export default function OrdersPage() {
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  // Estados para criar e editar pedidos
   const [newOrder, setNewOrder] = useState({ productId: '', quantity: 1, status: 'Pending' });
   const [orderToEdit, setOrderToEdit] = useState(null);
-
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [products, setProducts] = useState([]);
   const [filterId, setFilterId] = useState('');
   const [filteredOrders, setFilteredOrders] = useState([]);
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
 
+  // Carregar pedidos
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -32,6 +32,7 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
+  // Carregar produtos
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -44,6 +45,7 @@ export default function OrdersPage() {
     fetchProducts();
   }, []);
 
+  // Filtrar pedidos por ID
   useEffect(() => {
     if (filterId.trim()) {
       setFilteredOrders(orders.filter(o => o.id.includes(filterId.trim())));
@@ -52,6 +54,7 @@ export default function OrdersPage() {
     }
   }, [orders, filterId]);
 
+  // Definir cor do badge com base no status
   const getStatusVariant = (status) => {
     switch (status) {
       case 'Pending': return 'secondary';
@@ -62,28 +65,15 @@ export default function OrdersPage() {
     }
   };
 
-  const resetNewOrder = () => {
+  const handleCloseModal = () => {
+    setShowModal(false);
     setNewOrder({ productId: '', quantity: 1, status: 'Pending' });
-  };
-
-  const resetEditOrder = () => {
     setOrderToEdit(null);
   };
 
-  const handleAddClick = () => {
-    resetNewOrder();
-    setShowModal(true);
-  };
-
-  const handleDetailsClick = (order) => {
-    setOrderToEdit(order);
-    setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    resetNewOrder();
-    resetEditOrder();
+  const handleCloseDetailsModal = () => {
+    setShowDetailsModal(false);
+    setOrderToEdit(null);
   };
 
   const AddOrder = async () => {
@@ -92,8 +82,7 @@ export default function OrdersPage() {
         items: [{ productId: newOrder.productId, quantity: parseInt(newOrder.quantity) }],
         status: newOrder.status
       });
-      setShowModal(false);
-      resetNewOrder();
+      handleCloseModal();
       const data = await getOrders();
       setOrders(data);
     } catch (error) {
@@ -108,8 +97,7 @@ export default function OrdersPage() {
         items: [{ productId: orderToEdit.productId, quantity: parseInt(orderToEdit.quantity) }],
         status: orderToEdit.status
       });
-      setShowModal(false);
-      resetEditOrder();
+      handleCloseModal();
       const data = await getOrders();
       setOrders(data);
     } catch (error) {
@@ -120,9 +108,7 @@ export default function OrdersPage() {
   const DeleteOrder = async () => {
     try {
       const response = await deleteOrder(orderToDelete.id);
-
       if (response.success) {
-        console.log('Pedido excluído com sucesso');
         setOrders(orders.filter(order => order.id !== orderToDelete.id));
         setShowDeleteModal(false);
         setOrderToDelete(null);
@@ -148,7 +134,12 @@ export default function OrdersPage() {
       <h5 className="text-center mb-5">Dados vindos do MongoDB (Orders Read)</h5>
       <Row className="mb-4">
         <Col className="d-grid" md={6} lg={6}>
-          <Button variant="success" onClick={handleAddClick}>Adicionar Pedido</Button>
+          <Button variant="success" onClick={() => {
+            setNewOrder({ productId: '', quantity: 1, status: 'Pending' });
+            setShowModal(true);
+          }}>
+            Adicionar Pedido
+          </Button>
         </Col>
         <Col md={6} lg={6}>
           <InputGroup>
@@ -165,6 +156,7 @@ export default function OrdersPage() {
 
       {loading ? <p>Carregando...</p> : (
         <div>
+
           <Table striped bordered hover >
             <thead>
               <tr>
@@ -189,7 +181,10 @@ export default function OrdersPage() {
                   <td>
                     <Button
                       variant="info"
-                      onClick={() => handleDetailsClick(order)} 
+                      onClick={() => {
+                        setOrderToEdit(order);
+                        setShowDetailsModal(true);
+                      }}
                       className="w-auto me-2"
                     >
                       Detalhes
@@ -207,6 +202,7 @@ export default function OrdersPage() {
             </tbody>
           </Table>
 
+          {/* Editar / Adicionar */}
           <Modal show={showModal} onHide={handleCloseModal}>
             <Modal.Header closeButton>
               <Modal.Title>{orderToEdit ? 'Editar Pedido' : 'Novo Pedido'}</Modal.Title>
@@ -276,13 +272,13 @@ export default function OrdersPage() {
             </Modal.Footer>
           </Modal>
 
-          <Modal show={showModal} onHide={handleCloseModal}>
+          {/* Detalhes */}
+          <Modal show={showDetailsModal} onHide={handleCloseDetailsModal}>
             <Modal.Header closeButton>
               <Modal.Title>Detalhes do Pedido</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <div className="container-fluid">
-                {/* Informações do Pedido */}
                 <h5 className="mb-3">Informações do Pedido</h5>
                 <p><strong>ID do Pedido:</strong> {orderToEdit?.id}</p>
                 <p><strong>Cliente:</strong> {orderToEdit?.customerName}</p>
@@ -294,7 +290,6 @@ export default function OrdersPage() {
                   {orderToEdit?.items.map((item, index) => {
                     const product = products.find(p => p.name === item.productName);
                     const productPrice = product ? product.price : 0;
-
                     return (
                       <li key={index} className="list-group-item">
                         <p><strong>Produto:</strong> {item.productName || 'Produto não especificado'}</p>
@@ -308,10 +303,17 @@ export default function OrdersPage() {
               </div>
             </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleCloseModal}>Fechar</Button>
+              <Button variant="warning" onClick={() => {
+                setShowDetailsModal(false);
+                setShowModal(true);
+              }}>
+                Editar
+              </Button>
+              <Button variant="secondary" onClick={handleCloseDetailsModal}>Fechar</Button>
             </Modal.Footer>
           </Modal>
 
+          {/* Exclusão */}
           <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>Confirmar Exclusão</Modal.Title>
@@ -322,6 +324,7 @@ export default function OrdersPage() {
               <Button variant="danger" onClick={DeleteOrder}>Excluir</Button>
             </Modal.Footer>
           </Modal>
+
         </div>
       )}
     </Container>

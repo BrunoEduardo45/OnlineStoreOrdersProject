@@ -11,6 +11,7 @@ export default function ProductsPage() {
   const [newProduct, setNewProduct] = useState({ name: '', price: '' });
   const [productToDelete, setProductToDelete] = useState(null);
 
+  // Carregar produtos
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -70,7 +71,6 @@ export default function ProductsPage() {
     }
   };
 
-
   return (
     <Container>
       <h1 className="text-center my-5">Produtos</h1>
@@ -78,7 +78,6 @@ export default function ProductsPage() {
         <p>Carregando...</p>
       ) : (
         <div>
-          {/* Cadastrar produto */}
           <Button className='mb-4 w-50' variant="success" onClick={() => setShowModal(true)}>
             Adicionar Produto
           </Button>
@@ -125,7 +124,7 @@ export default function ProductsPage() {
             </tbody>
           </Table>
 
-          {/* Editar produto */}
+          {/* Editar */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>{productToEdit ? 'Editar Produto' : 'Novo Produto'}</Modal.Title>
@@ -177,7 +176,7 @@ export default function ProductsPage() {
             </Modal.Footer>
           </Modal>
 
-          {/* Modal exclusão */}
+          {/* Excluir */}
           <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>Confirmar Exclusão</Modal.Title>

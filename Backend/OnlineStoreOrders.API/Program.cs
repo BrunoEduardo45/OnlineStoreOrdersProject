@@ -43,8 +43,7 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssembly(typeof(OnlineStoreOrders.Application.AssemblyReference).Assembly));
 
 // Ajuste do GUID no MongoDB
-MongoDB.Bson.Serialization.BsonSerializer.RegisterSerializer(
-    typeof(Guid),
+MongoDB.Bson.Serialization.BsonSerializer.RegisterSerializer<Guid>(
     new MongoDB.Bson.Serialization.Serializers.GuidSerializer(MongoDB.Bson.GuidRepresentation.Standard)
 );
 

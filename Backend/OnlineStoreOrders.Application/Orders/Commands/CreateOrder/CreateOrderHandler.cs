@@ -71,7 +71,7 @@ namespace OnlineStoreOrders.Application.Orders.Commands.CreateOrder
             // Persistir no SQL Server
             await _orderRepository.AddAsync(order, cancellationToken);
 
-            // Persistir no MongoDB (Read Model)
+            // Persistir no MongoDB
             var readModel = new OrderReadModel
             {
                 Id = order.Id,

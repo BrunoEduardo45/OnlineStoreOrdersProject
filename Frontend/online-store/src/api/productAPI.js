@@ -1,6 +1,6 @@
 const API_URL = "https://localhost:7000/api"; 
 
-// Obter todos os produtos
+// Obter todos
 export const getProducts = async () => {
   const response = await fetch(`${API_URL}/products`);
   if (!response.ok) {
@@ -9,7 +9,7 @@ export const getProducts = async () => {
   return await response.json();
 };
 
-// Obter um produto específico
+// produto por ID
 export const getProductById = async (id) => {
   const response = await fetch(`${API_URL}/products/${id}`); 
   if (!response.ok) {
@@ -18,7 +18,7 @@ export const getProductById = async (id) => {
   return await response.json();
 };
 
-// Criar um novo produto
+// Criar
 export const createProduct = async (product) => {
   const response = await fetch(`${API_URL}/products`, {
     method: 'POST',
@@ -30,10 +30,10 @@ export const createProduct = async (product) => {
   if (!response.ok) {
     throw new Error("Erro ao criar produto");
   }
-  return await response.json(); // Retorna o produto criado ou algo do tipo
+  return await response.json();
 };
 
-// Atualizar um produto existente
+// Atualizar
 export const updateProduct = async (product) => {
   const response = await fetch(`${API_URL}/products/${product.id}`, {
     method: 'PUT',
@@ -45,10 +45,10 @@ export const updateProduct = async (product) => {
   if (!response.ok) {
     throw new Error("Erro ao atualizar produto");
   }
-  return await response.json(); // Retorna o produto atualizado
+  return await response.json();
 };
 
-// Excluir um produto
+// Excluir
 export const deleteProduct = async (id) => {
   const response = await fetch(`${API_URL}/products/${id}`, {
     method: 'DELETE',

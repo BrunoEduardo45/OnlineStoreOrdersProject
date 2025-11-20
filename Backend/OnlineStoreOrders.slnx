@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="OnlineStoreOrders.API/OnlineStoreOrders.API.csproj" Id="be25dfd0-9f9b-41c4-a74f-94db3ebc9a86" />
+  <Project Path="OnlineStoreOrders.Application/OnlineStoreOrders.Application.csproj" />
+  <Project Path="OnlineStoreOrders.Domain/OnlineStoreOrders.Domain.csproj" />
+  <Project Path="OnlineStoreOrders.Infrastructure/OnlineStoreOrders.Infrastructure.csproj" />
+</Solution>
